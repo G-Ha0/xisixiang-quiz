@@ -191,6 +191,34 @@ async function loadQuestions() {
 
 loadQuestions();
 
+function generateQRCode() {
+    const container = document.getElementById('qrcode-container');
+    const urlEl = document.getElementById('qrcode-url');
+    const currentUrl = window.location.href.split('#')[0].split('?')[0];
+    
+    urlEl.textContent = currentUrl;
+    
+    if (typeof QRCode !== 'undefined') {
+        container.innerHTML = '';
+        new QRCode(container, {
+            text: currentUrl,
+            width: 140,
+            height: 140,
+            colorDark: '#333333',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    } else {
+        container.innerHTML = '<p class="qrcode-loading">二维码加载中...</p>';
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', generateQRCode);
+} else {
+    generateQRCode();
+}
+
 function shuffleArray(array) {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {

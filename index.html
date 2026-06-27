@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>毛概习概刷题系统</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -58,6 +59,14 @@
                     <li>每答完一题立即显示对错和解析</li>
                     <li>全部答完后显示本次得分</li>
                 </ul>
+            </div>
+
+            <div class="qrcode-card">
+                <h3>📱 手机扫码访问</h3>
+                <div id="qrcode-container" class="qrcode-container">
+                    <p class="qrcode-loading">生成中...</p>
+                </div>
+                <p class="qrcode-url" id="qrcode-url"></p>
             </div>
         </div>
 
