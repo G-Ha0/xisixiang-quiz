@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毛概习概刷题系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>毛概习概刷题系统</h1>
+            <p class="subtitle">随机抽题 · 即时反馈 · 详细解析</p>
+        </header>
+
+        <div id="start-screen" class="screen active">
+            <div class="start-card">
+                <div class="start-icon">📚</div>
+                <h2>开始答题</h2>
+                <p class="start-desc">每次随机抽取 10 道题，做完一题显示对错和解析</p>
+                
+                <div class="settings">
+                    <div class="setting-item">
+                        <label for="question-count">题目数量：</label>
+                        <select id="question-count">
+                            <option value="5">5 道</option>
+                            <option value="10" selected>10 道</option>
+                            <option value="15">15 道</option>
+                            <option value="20">20 道</option>
+                            <option value="0">全部题目</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="question-type">题目类型：</label>
+                        <select id="question-type">
+                            <option value="all" selected>全部类型</option>
+                            <option value="single">单选题</option>
+                            <option value="multiple">多选题</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="file-upload-area">
+                    <p class="upload-hint">📁 加载题目数据</p>
+                    <input type="file" id="file-input" accept=".json" hidden>
+                    <button id="upload-btn" class="btn btn-secondary">选择题目文件</button>
+                    <p id="file-status" class="file-status">当前：示例题目</p>
+                </div>
+
+                <button id="start-btn" class="btn btn-primary btn-large">开始答题</button>
+            </div>
+
+            <div class="help-card">
+                <h3>📖 使用说明</h3>
+                <ul>
+                    <li>点击"选择题目文件"加载 JSON 格式的题目数据</li>
+                    <li>设置题目数量和类型后点击"开始答题"</li>
+                    <li>每答完一题立即显示对错和解析</li>
+                    <li>全部答完后显示本次得分</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div class="progress-info">
+                    <span id="current-num">1</span> / <span id="total-num">10</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div class="quiz-stats">
+                    <span class="correct-count">✅ 正确: <span id="correct-num">0</span></span>
+                    <span class="wrong-count">❌ 错误: <span id="wrong-num">0</span></span>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-type-tag" id="question-type-tag">单选题</div>
+                <h3 class="question-text" id="question-text">题目内容</h3>
+                <div class="options-list" id="options-list">
+                </div>
+                <button id="submit-btn" class="btn btn-primary btn-submit hidden">提交答案</button>
+            </div>
+
+            <div id="explanation-card" class="explanation-card hidden">
+                <div class="result-banner" id="result-banner">
+                    <span id="result-icon">✅</span>
+                    <span id="result-text">回答正确！</span>
+                </div>
+                <div class="correct-answer" id="correct-answer"></div>
+                <div class="explanation-section">
+                    <h4>📝 解析</h4>
+                    <p id="explanation-text"></p>
+                </div>
+                <button id="next-btn" class="btn btn-primary">下一题</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen">
+            <div class="result-card">
+                <div class="result-icon-large" id="result-icon-large">🎉</div>
+                <h2>答题完成！</h2>
+                <div class="score-display">
+                    <div class="score-circle">
+                        <span id="final-score">0</span>
+                        <span class="score-unit">分</span>
+                    </div>
+                </div>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-total">0</span>
+                        <span class="stat-label">总题数</span>
+                    </div>
+                    <div class="stat-item correct">
+                        <span class="stat-value" id="stat-correct">0</span>
+                        <span class="stat-label">正确</span>
+                    </div>
+                    <div class="stat-item wrong">
+                        <span class="stat-value" id="stat-wrong">0</span>
+                        <span class="stat-label">错误</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat-rate">0%</span>
+                        <span class="stat-label">正确率</span>
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <button id="review-btn" class="btn btn-secondary">查看错题</button>
+                    <button id="restart-btn" class="btn btn-primary">再来一组</button>
+                </div>
+            </div>
+
+            <div id="review-section" class="review-section hidden">
+                <h3>📋 错题回顾</h3>
+                <div id="review-list" class="review-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

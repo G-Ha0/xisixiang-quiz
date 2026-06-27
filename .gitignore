@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# PDF 原始文件
+*.pdf
+
+# 中间文件
+extracted_*.json
+extracted_*.txt
+questions-template.json
+
+# 临时文件
+*.tmp
+*.log
+
+# 系统文件
+Thumbs.db
+.DS_Store
