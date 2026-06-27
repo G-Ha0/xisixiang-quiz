@@ -131,6 +131,106 @@ const sampleQuestions = [
     }
 ];
 
+const STORAGE_KEY = 'quiz_app_stats';
+
+function loadStats() {
+    try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) return JSON.parse(data);
+    } catch (e) {}
+    return { questionRecords: {} };
+}
+
+function saveStats(stats) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    } catch (e) {}
+}
+
+function getQuestionKey(q) {
+    return q.question.slice(0, 60);
+}
+
+function recordAnswer(question, isCorrect) {
+    const stats = loadStats();
+    const key = getQuestionKey(question);
+    if (!stats.questionRecords[key]) {
+        stats.questionRecords[key] = { done: 0, correct: 0, wrong: 0 };
+    }
+    stats.questionRecords[key].done++;
+    if (isCorrect) {
+        stats.questionRecords[key].correct++;
+    } else {
+        stats.questionRecords[key].wrong++;
+    }
+    saveStats(stats);
+}
+
+function getWrongQuestions(questions) {
+    const stats = loadStats();
+    return questions.filter(q => {
+        const key = getQuestionKey(q);
+        const rec = stats.questionRecords[key];
+        return rec && rec.wrong > 0;
+    });
+}
+
+function getWeightedQuestions(questions) {
+    const stats = loadStats();
+    const result = [];
+    
+    for (const q of questions) {
+        const key = getQuestionKey(q);
+        const rec = stats.questionRecords[key];
+        let weight = 10;
+        
+        if (rec) {
+            if (rec.wrong > 0) {
+                weight = 8;
+            } else if (rec.correct >= 1) {
+                weight = 2;
+            }
+        }
+        
+        for (let i = 0; i < weight; i++) {
+            result.push(q);
+        }
+    }
+    
+    return result;
+}
+
+function getAllDoneCount(questions) {
+    const stats = loadStats();
+    let count = 0;
+    for (const q of questions) {
+        const key = getQuestionKey(q);
+        if (stats.questionRecords[key] && stats.questionRecords[key].done > 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
+function getWrongCount(questions) {
+    return getWrongQuestions(questions).length;
+}
+
+function updateStatsDisplay() {
+    const doneEl = document.getElementById('stat-done');
+    const wrongEl = document.getElementById('stat-wrong-total');
+    if (doneEl) doneEl.textContent = getAllDoneCount(allQuestions);
+    if (wrongEl) wrongEl.textContent = getWrongCount(allQuestions);
+}
+
+function resetAllStats() {
+    if (confirm('确定要重置所有答题进度吗？错题记录也会被清空。')) {
+        localStorage.removeItem(STORAGE_KEY);
+        updateStatsDisplay();
+        alert('进度已重置！');
+    }
+}
+
 const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
 const resultScreen = document.getElementById('result-screen');
@@ -141,6 +241,8 @@ const fileInput = document.getElementById('file-input');
 const fileStatus = document.getElementById('file-status');
 const questionCountSelect = document.getElementById('question-count');
 const questionTypeSelect = document.getElementById('question-type');
+const practiceModeSelect = document.getElementById('practice-mode');
+const resetStatsBtn = document.getElementById('reset-stats-btn');
 
 const currentNumEl = document.getElementById('current-num');
 const totalNumEl = document.getElementById('total-num');
@@ -181,12 +283,14 @@ async function loadQuestions() {
                 allQuestions = data;
                 fileStatus.textContent = `已加载：${data.length} 道题目`;
                 fileStatus.style.color = '#10b981';
+                updateStatsDisplay();
                 return;
             }
         }
     } catch (e) {
     }
     allQuestions = sampleQuestions;
+    updateStatsDisplay();
 }
 
 loadQuestions();
@@ -238,10 +342,19 @@ function showScreen(screen) {
 function startQuiz() {
     let count = parseInt(questionCountSelect.value);
     let typeFilter = questionTypeSelect.value;
+    let mode = practiceModeSelect.value;
 
     let filteredQuestions = allQuestions;
     if (typeFilter !== 'all') {
         filteredQuestions = allQuestions.filter(q => q.type === typeFilter);
+    }
+
+    if (mode === 'wrong') {
+        filteredQuestions = getWrongQuestions(filteredQuestions);
+        if (filteredQuestions.length === 0) {
+            alert('还没有错题记录，快去做题吧！');
+            return;
+        }
     }
 
     if (filteredQuestions.length === 0) {
@@ -253,7 +366,23 @@ function startQuiz() {
         count = filteredQuestions.length;
     }
 
-    currentQuestions = shuffleArray(filteredQuestions).slice(0, count);
+    let sourceQuestions = filteredQuestions;
+    if (mode === 'weighted') {
+        sourceQuestions = getWeightedQuestions(filteredQuestions);
+    }
+
+    const shuffled = shuffleArray(sourceQuestions);
+    const selected = [];
+    const seen = new Set();
+    for (const q of shuffled) {
+        if (selected.length >= count) break;
+        const key = getQuestionKey(q);
+        if (mode === 'weighted' && seen.has(key)) continue;
+        seen.add(key);
+        selected.push(q);
+    }
+
+    currentQuestions = selected;
     currentIndex = 0;
     correctCount = 0;
     wrongCount = 0;
@@ -360,12 +489,14 @@ function checkAnswer() {
         resultBanner.className = 'result-banner correct';
         resultIcon.textContent = '✅';
         resultText.textContent = '回答正确！';
+        recordAnswer(question, true);
     } else {
         wrongCount++;
         wrongNumEl.textContent = wrongCount;
         resultBanner.className = 'result-banner wrong';
         resultIcon.textContent = '❌';
         resultText.textContent = '回答错误';
+        recordAnswer(question, false);
         let yourAnsText, correctAnsTextFull;
         if (question.type === 'judge') {
             yourAnsText = selectedOptions.map(i => (i === 1 ? '对' : '错')).join('、');
@@ -521,10 +652,16 @@ function validateQuestions(questions) {
 startBtn.addEventListener('click', startQuiz);
 nextBtn.addEventListener('click', nextQuestion);
 submitBtn.addEventListener('click', checkAnswer);
-restartBtn.addEventListener('click', () => showScreen(startScreen));
+restartBtn.addEventListener('click', () => {
+    updateStatsDisplay();
+    showScreen(startScreen);
+});
 reviewBtn.addEventListener('click', showReview);
 uploadBtn.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', handleFileUpload);
+if (resetStatsBtn) {
+    resetStatsBtn.addEventListener('click', resetAllStats);
+}
 
 document.addEventListener('keydown', (e) => {
     if (!quizScreen.classList.contains('active')) return;

@@ -22,6 +22,14 @@
                 
                 <div class="settings">
                     <div class="setting-item">
+                        <label for="practice-mode">练习模式：</label>
+                        <select id="practice-mode">
+                            <option value="normal" selected>普通模式</option>
+                            <option value="weighted">智能复习（权重模式）</option>
+                            <option value="wrong">错题练习</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
                         <label for="question-count">题目数量：</label>
                         <select id="question-count">
                             <option value="5">5 道</option>
@@ -40,6 +48,18 @@
                             <option value="judge">判断题</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="stats-info">
+                    <div class="stat-chip">
+                        <span class="stat-chip-icon">📝</span>
+                        <span>已做过: <strong id="stat-done">0</strong> 道</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="stat-chip-icon">❌</span>
+                        <span>错题: <strong id="stat-wrong-total">0</strong> 道</span>
+                    </div>
+                    <button id="reset-stats-btn" class="btn-text">重置进度</button>
                 </div>
 
                 <div class="file-upload-area">
