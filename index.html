@@ -14,18 +14,52 @@
             <p class="subtitle">随机抽题 · 即时反馈 · 详细解析</p>
         </header>
 
-        <div id="start-screen" class="screen active">
+        <div id="home-screen" class="screen active">
+            <div class="mode-cards">
+                <div class="mode-card" id="mode-practice">
+                    <div class="mode-icon">📝</div>
+                    <h2>练习模式</h2>
+                    <p class="mode-desc">智能复习 + 错题练习<br>基于题库随机抽题</p>
+                    <div class="mode-stats">
+                        <span>📚 <span id="practice-total">0</span> 道题</span>
+                        <span>❌ <span id="practice-wrong">0</span> 道错题</span>
+                    </div>
+                    <button class="btn btn-primary btn-large">进入练习</button>
+                </div>
+
+                <div class="mode-card mode-real" id="mode-real-exam">
+                    <div class="mode-icon">📄</div>
+                    <h2>真题模拟</h2>
+                    <p class="mode-desc">历年期末考试真题<br>独立题库和错题集</p>
+                    <div class="mode-stats">
+                        <span>📚 <span id="real-total">0</span> 道题</span>
+                        <span>❌ <span id="real-wrong">0</span> 道错题</span>
+                    </div>
+                    <button class="btn btn-primary btn-large">进入模拟</button>
+                </div>
+            </div>
+
+            <div class="qrcode-card">
+                <h3>📱 手机扫码访问</h3>
+                <div id="qrcode-container" class="qrcode-container">
+                    <p class="qrcode-loading">生成中...</p>
+                </div>
+                <p class="qrcode-url" id="qrcode-url"></p>
+            </div>
+        </div>
+
+        <div id="start-screen" class="screen">
             <div class="start-card">
-                <div class="start-icon">📚</div>
-                <h2>开始答题</h2>
-                <p class="start-desc">每次随机抽取 10 道题，做完一题显示对错和解析</p>
+                <button class="btn-back" id="back-to-home">← 返回首页</button>
+                <div class="start-icon" id="start-icon">📚</div>
+                <h2 id="start-title">开始答题</h2>
+                <p class="start-desc" id="start-desc">每次随机抽取题目，做完一题显示对错和解析</p>
                 
                 <div class="settings">
                     <div class="setting-item">
                         <label for="practice-mode">练习模式：</label>
                         <select id="practice-mode">
-                            <option value="normal" selected>普通模式</option>
-                            <option value="weighted">智能复习（权重模式）</option>
+                            <option value="weighted" selected>智能复习（权重模式）</option>
                             <option value="wrong">错题练习</option>
                         </select>
                     </div>
@@ -62,37 +96,24 @@
                     <button id="reset-stats-btn" class="btn-text">重置进度</button>
                 </div>
 
-                <div class="file-upload-area">
-                    <p class="upload-hint">📁 加载题目数据</p>
-                    <input type="file" id="file-input" accept=".json" hidden>
-                    <button id="upload-btn" class="btn btn-secondary">选择题目文件</button>
-                    <p id="file-status" class="file-status">当前：示例题目</p>
-                </div>
-
                 <button id="start-btn" class="btn btn-primary btn-large">开始答题</button>
             </div>
 
             <div class="help-card">
                 <h3>📖 使用说明</h3>
                 <ul>
-                    <li>点击"选择题目文件"加载 JSON 格式的题目数据</li>
+                    <li>智能复习模式：错题权重更高，优先练习薄弱题</li>
+                    <li>错题练习模式：只做之前做错的题目</li>
                     <li>设置题目数量和类型后点击"开始答题"</li>
                     <li>每答完一题立即显示对错和解析</li>
                     <li>全部答完后显示本次得分</li>
                 </ul>
             </div>
-
-            <div class="qrcode-card">
-                <h3>📱 手机扫码访问</h3>
-                <div id="qrcode-container" class="qrcode-container">
-                    <p class="qrcode-loading">生成中...</p>
-                </div>
-                <p class="qrcode-url" id="qrcode-url"></p>
-            </div>
         </div>
 
         <div id="quiz-screen" class="screen">
             <div class="quiz-header">
+                <button class="btn-back-small" id="back-from-quiz">← 退出</button>
                 <div class="progress-info">
                     <span id="current-num">1</span> / <span id="total-num">10</span>
                 </div>
@@ -159,6 +180,7 @@
                     <button id="review-btn" class="btn btn-secondary">查看错题</button>
                     <button id="restart-btn" class="btn btn-primary">再来一组</button>
                 </div>
+                <button id="back-home-btn" class="btn btn-secondary btn-wide" style="margin-top: 12px;">返回首页</button>
             </div>
 
             <div id="review-section" class="review-section hidden">

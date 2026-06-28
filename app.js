@@ -1,6 +1,8 @@
 const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
+let currentModule = 'practice';
 let allQuestions = [];
+let realExamQuestions = [];
 let currentQuestions = [];
 let currentIndex = 0;
 let correctCount = 0;
@@ -8,134 +10,20 @@ let wrongCount = 0;
 let wrongQuestions = [];
 let answered = false;
 
-const sampleQuestions = [
-    {
-        type: "single",
-        question: "马克思主义中国化的第一个重大理论成果是？",
-        options: [
-            "毛泽东思想",
-            "邓小平理论",
-            "“三个代表”重要思想",
-            "科学发展观"
-        ],
-        answer: [0],
-        explanation: "毛泽东思想是马克思主义中国化的第一个重大理论成果。毛泽东思想是马克思列宁主义在中国的运用和发展，是被实践证明了的关于中国革命和建设的正确的理论原则和经验总结，是中国共产党集体智慧的结晶。"
-    },
-    {
-        type: "single",
-        question: "中国特色社会主义进入新时代的时间标志是？",
-        options: [
-            "党的十八大",
-            "党的十九大",
-            "党的十八届三中全会",
-            "党的十九届四中全会"
-        ],
-        answer: [1],
-        explanation: "党的十九大报告指出，经过长期努力，中国特色社会主义进入了新时代，这是我国发展新的历史方位。作出这个重大政治判断，是改革开放以来我国经济社会发展进步的必然结果，是我国社会主要矛盾运动的必然结果，是党团结带领人民开创光明未来的必然要求。"
-    },
-    {
-        type: "single",
-        question: "我国社会主要矛盾已经转化为？",
-        options: [
-            "人民日益增长的物质文化需要同落后的社会生产之间的矛盾",
-            "人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾",
-            "无产阶级和资产阶级之间的矛盾",
-            "生产力和生产关系之间的矛盾"
-        ],
-        answer: [1],
-        explanation: "党的十九大明确指出，我国社会主要矛盾已经转化为人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾。主要依据有以下三个方面：一是经过改革开放40年的发展，我国社会生产力水平总体上显著提高，很多方面进入世界前列。二是人民生活水平显著提高，对美好生活的向往更加强烈。三是影响满足人们美好生活需要的因素很多，但主要是发展的不平衡不充分问题。"
-    },
-    {
-        type: "multiple",
-        question: "“四个全面”战略布局包括？",
-        options: [
-            "全面建设社会主义现代化国家",
-            "全面深化改革",
-            "全面依法治国",
-            "全面从严治党"
-        ],
-        answer: [0, 1, 2, 3],
-        explanation: "“四个全面”战略布局，即全面建设社会主义现代化国家、全面深化改革、全面依法治国、全面从严治党。“四个全面”战略布局是党在新形势下治国理政的总方略，是事关党和国家长远发展的总战略。"
-    },
-    {
-        type: "multiple",
-        question: "新发展理念包括？",
-        options: [
-            "创新、协调",
-            "绿色、开放",
-            "共享",
-            "高速"
-        ],
-        answer: [0, 1, 2],
-        explanation: "新发展理念是习近平新时代中国特色社会主义经济思想的主要内容，包括创新、协调、绿色、开放、共享的发展理念。创新是引领发展的第一动力，协调是持续健康发展的内在要求，绿色是永续发展的必要条件，开放是国家繁荣发展的必由之路，共享是中国特色社会主义的本质要求。"
-    },
-    {
-        type: "single",
-        question: "中国共产党的根本宗旨是？",
-        options: [
-            "实现共产主义",
-            "全心全意为人民服务",
-            "解放和发展生产力",
-            "建设社会主义现代化强国"
-        ],
-        answer: [1],
-        explanation: "全心全意为人民服务是中国共产党的根本宗旨。中国共产党始终代表最广大人民根本利益，与人民休戚与共、生死相依，没有任何自己特殊的利益，从来不代表任何利益集团、任何权势团体、任何特权阶层的利益。"
-    },
-    {
-        type: "single",
-        question: "社会主义的本质是？",
-        options: [
-            "公有制和按劳分配",
-            "解放生产力，发展生产力，消灭剥削，消除两极分化，最终达到共同富裕",
-            "人民当家作主",
-            "无产阶级专政"
-        ],
-        answer: [1],
-        explanation: "邓小平在1992年南方谈话中提出了社会主义本质的著名论断：“社会主义的本质，是解放生产力，发展生产力，消灭剥削，消除两极分化，最终达到共同富裕。”这一论断，从生产力和生产关系的统一中，科学地回答了什么是社会主义的问题。"
-    },
-    {
-        type: "multiple",
-        question: "以下属于“五位一体”总体布局的有？",
-        options: [
-            "经济建设",
-            "政治建设",
-            "文化建设",
-            "社会建设"
-        ],
-        answer: [0, 1, 2, 3],
-        explanation: "“五位一体”总体布局是指经济建设、政治建设、文化建设、社会建设、生态文明建设五位一体。“五位一体”总体布局是一个有机整体，其中经济建设是根本，政治建设是保证，文化建设是灵魂，社会建设是条件，生态文明建设是基础。"
-    },
-    {
-        type: "single",
-        question: "中国梦的本质是？",
-        options: [
-            "国家富强、民族振兴、人民幸福",
-            "实现共产主义",
-            "全面建成小康社会",
-            "建设社会主义现代化强国"
-        ],
-        answer: [0],
-        explanation: "中国梦的本质是国家富强、民族振兴、人民幸福。国家富强，是指我国综合国力进一步增强，中国特色社会主义事业进一步发展和完善。民族振兴，就是通过自身的不断发展与强大，继承并创造中华民族的优秀文化以及先进的文明成果，进而使中华民族再次处于世界领先的地位。人民幸福，就是人民权利保障更加充分、人人得享共同发展。"
-    },
-    {
-        type: "single",
-        question: "党执政兴国的第一要务是？",
-        options: [
-            "改革",
-            "发展",
-            "稳定",
-            "创新"
-        ],
-        answer: [1],
-        explanation: "发展是党执政兴国的第一要务。发展是解决我国一切问题的基础和关键。实现中华民族伟大复兴的中国梦，不断提高人民生活水平，必须坚定不移把发展作为党执政兴国的第一要务，坚持解放和发展社会生产力，坚持社会主义市场经济改革方向，推动经济持续健康发展。"
-    }
-];
+const STORAGE_KEY_PRACTICE = 'quiz_app_practice_stats';
+const STORAGE_KEY_REAL = 'quiz_app_real_stats';
 
-const STORAGE_KEY = 'quiz_app_stats';
+function getStorageKey() {
+    return currentModule === 'practice' ? STORAGE_KEY_PRACTICE : STORAGE_KEY_REAL;
+}
+
+function getCurrentQuestions() {
+    return currentModule === 'practice' ? allQuestions : realExamQuestions;
+}
 
 function loadStats() {
     try {
-        const data = localStorage.getItem(STORAGE_KEY);
+        const data = localStorage.getItem(getStorageKey());
         if (data) return JSON.parse(data);
     } catch (e) {}
     return { questionRecords: {} };
@@ -143,7 +31,7 @@ function loadStats() {
 
 function saveStats(stats) {
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+        localStorage.setItem(getStorageKey(), JSON.stringify(stats));
     } catch (e) {}
 }
 
@@ -217,28 +105,55 @@ function getWrongCount(questions) {
 }
 
 function updateStatsDisplay() {
+    const questions = getCurrentQuestions();
     const doneEl = document.getElementById('stat-done');
     const wrongEl = document.getElementById('stat-wrong-total');
-    if (doneEl) doneEl.textContent = getAllDoneCount(allQuestions);
-    if (wrongEl) wrongEl.textContent = getWrongCount(allQuestions);
+    if (doneEl) doneEl.textContent = getAllDoneCount(questions);
+    if (wrongEl) wrongEl.textContent = getWrongCount(questions);
+}
+
+function updateHomeStats() {
+    const practiceTotalEl = document.getElementById('practice-total');
+    const practiceWrongEl = document.getElementById('practice-wrong');
+    const realTotalEl = document.getElementById('real-total');
+    const realWrongEl = document.getElementById('real-wrong');
+    
+    if (practiceTotalEl) practiceTotalEl.textContent = allQuestions.length;
+    if (practiceWrongEl) practiceWrongEl.textContent = getWrongCountFor(allQuestions, STORAGE_KEY_PRACTICE);
+    if (realTotalEl) realTotalEl.textContent = realExamQuestions.length;
+    if (realWrongEl) realWrongEl.textContent = getWrongCountFor(realExamQuestions, STORAGE_KEY_REAL);
+}
+
+function getWrongCountFor(questions, storageKey) {
+    try {
+        const data = localStorage.getItem(storageKey);
+        if (!data) return 0;
+        const stats = JSON.parse(data);
+        return questions.filter(q => {
+            const key = q.question.slice(0, 60);
+            const rec = stats.questionRecords[key];
+            return rec && rec.wrong > 0;
+        }).length;
+    } catch (e) {
+        return 0;
+    }
 }
 
 function resetAllStats() {
     if (confirm('确定要重置所有答题进度吗？错题记录也会被清空。')) {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(getStorageKey());
         updateStatsDisplay();
+        updateHomeStats();
         alert('进度已重置！');
     }
 }
 
+const homeScreen = document.getElementById('home-screen');
 const startScreen = document.getElementById('start-screen');
 const quizScreen = document.getElementById('quiz-screen');
 const resultScreen = document.getElementById('result-screen');
 
 const startBtn = document.getElementById('start-btn');
-const uploadBtn = document.getElementById('upload-btn');
-const fileInput = document.getElementById('file-input');
-const fileStatus = document.getElementById('file-status');
 const questionCountSelect = document.getElementById('question-count');
 const questionTypeSelect = document.getElementById('question-type');
 const practiceModeSelect = document.getElementById('practice-mode');
@@ -271,29 +186,47 @@ const statRateEl = document.getElementById('stat-rate');
 const resultIconLarge = document.getElementById('result-icon-large');
 const reviewBtn = document.getElementById('review-btn');
 const restartBtn = document.getElementById('restart-btn');
+const backHomeBtn = document.getElementById('back-home-btn');
 const reviewSection = document.getElementById('review-section');
 const reviewList = document.getElementById('review-list');
 
-async function loadQuestions() {
+const backToHomeBtn = document.getElementById('back-to-home');
+const backFromQuizBtn = document.getElementById('back-from-quiz');
+const modePracticeBtn = document.getElementById('mode-practice');
+const modeRealExamBtn = document.getElementById('mode-real-exam');
+
+async function loadPracticeQuestions() {
     try {
         const response = await fetch('questions.json');
         if (response.ok) {
             const data = await response.json();
             if (Array.isArray(data) && data.length > 0) {
                 allQuestions = data;
-                fileStatus.textContent = `已加载：${data.length} 道题目`;
-                fileStatus.style.color = '#10b981';
-                updateStatsDisplay();
                 return;
             }
         }
-    } catch (e) {
-    }
-    allQuestions = sampleQuestions;
-    updateStatsDisplay();
+    } catch (e) {}
 }
 
-loadQuestions();
+async function loadRealExamQuestions() {
+    try {
+        const response = await fetch('questions_real_exam.json');
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                realExamQuestions = data;
+                return;
+            }
+        }
+    } catch (e) {}
+}
+
+async function init() {
+    await Promise.all([loadPracticeQuestions(), loadRealExamQuestions()]);
+    updateHomeStats();
+}
+
+init();
 
 function generateQRCode() {
     const container = document.getElementById('qrcode-container');
@@ -333,20 +266,57 @@ function shuffleArray(array) {
 }
 
 function showScreen(screen) {
+    homeScreen.classList.remove('active');
     startScreen.classList.remove('active');
     quizScreen.classList.remove('active');
     resultScreen.classList.remove('active');
     screen.classList.add('active');
 }
 
+function enterPracticeMode() {
+    currentModule = 'practice';
+    const startTitle = document.getElementById('start-title');
+    const startDesc = document.getElementById('start-desc');
+    const startIcon = document.getElementById('start-icon');
+    const questionTypeOption = questionTypeSelect.querySelector('option[value="judge"]');
+    
+    startTitle.textContent = '练习模式';
+    startDesc.textContent = '智能复习 + 错题练习，基于题库随机抽题';
+    startIcon.textContent = '📝';
+    questionTypeOption.style.display = '';
+    
+    updateStatsDisplay();
+    showScreen(startScreen);
+}
+
+function enterRealExamMode() {
+    currentModule = 'real';
+    const startTitle = document.getElementById('start-title');
+    const startDesc = document.getElementById('start-desc');
+    const startIcon = document.getElementById('start-icon');
+    const questionTypeOption = questionTypeSelect.querySelector('option[value="judge"]');
+    
+    startTitle.textContent = '真题模拟';
+    startDesc.textContent = '历年期末考试真题，独立题库和错题集';
+    startIcon.textContent = '📄';
+    questionTypeOption.style.display = 'none';
+    if (questionTypeSelect.value === 'judge') {
+        questionTypeSelect.value = 'all';
+    }
+    
+    updateStatsDisplay();
+    showScreen(startScreen);
+}
+
 function startQuiz() {
+    const questions = getCurrentQuestions();
     let count = parseInt(questionCountSelect.value);
     let typeFilter = questionTypeSelect.value;
     let mode = practiceModeSelect.value;
 
-    let filteredQuestions = allQuestions;
+    let filteredQuestions = questions;
     if (typeFilter !== 'all') {
-        filteredQuestions = allQuestions.filter(q => q.type === typeFilter);
+        filteredQuestions = questions.filter(q => q.type === typeFilter);
     }
 
     if (mode === 'wrong') {
@@ -520,7 +490,7 @@ function checkAnswer() {
         correctAnsText = question.answer.map(i => optionLabels[i]).join('、');
     }
     correctAnswerEl.innerHTML = `正确答案：<strong>${correctAnsText}</strong>`;
-    explanationText.textContent = question.explanation;
+    explanationText.textContent = question.explanation || '暂无解析';
 
     explanationCard.classList.remove('hidden');
     submitBtn.classList.add('hidden');
@@ -577,6 +547,7 @@ function showResult() {
         reviewBtn.style.display = '';
     }
 
+    updateHomeStats();
     showScreen(resultScreen);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -593,7 +564,7 @@ function showReview() {
                     <div class="review-your-answer">你的答案：${item.yourAnswer}</div>
                     <div class="review-correct-answer">正确答案：${item.correctAnswer}</div>
                 </div>
-                <div class="review-explanation">📝 解析：${item.explanation}</div>
+                <div class="review-explanation">📝 解析：${item.explanation || '暂无解析'}</div>
             `;
             reviewList.appendChild(reviewItem);
         });
@@ -605,50 +576,17 @@ function showReview() {
     }
 }
 
-function handleFileUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        try {
-            const data = JSON.parse(event.target.result);
-            if (Array.isArray(data) && data.length > 0) {
-                const valid = validateQuestions(data);
-                if (valid) {
-                    allQuestions = data;
-                    fileStatus.textContent = `已加载：${data.length} 道题目`;
-                    fileStatus.style.color = '#10b981';
-                } else {
-                    alert('题目数据格式不正确，请检查格式！');
-                }
-            } else {
-                alert('题目数据格式不正确，应为非空数组！');
-            }
-        } catch (err) {
-            alert('JSON文件解析失败，请检查文件格式！');
-        }
-    };
-    reader.readAsText(file);
-}
-
-function validateQuestions(questions) {
-    for (const q of questions) {
-        if (!q.question || !Array.isArray(q.options) || !Array.isArray(q.answer) || q.answer.length === 0) {
-            return false;
-        }
-        if (!q.type || !['single', 'multiple'].includes(q.type)) {
-            return false;
-        }
-        for (const ans of q.answer) {
-            if (ans < 0 || ans >= q.options.length) {
-                return false;
-            }
-        }
+modePracticeBtn.addEventListener('click', enterPracticeMode);
+modeRealExamBtn.addEventListener('click', enterRealExamMode);
+backToHomeBtn.addEventListener('click', () => {
+    updateHomeStats();
+    showScreen(homeScreen);
+});
+backFromQuizBtn.addEventListener('click', () => {
+    if (confirm('确定要退出答题吗？当前进度不会保存。')) {
+        showScreen(startScreen);
     }
-    return true;
-}
-
+});
 startBtn.addEventListener('click', startQuiz);
 nextBtn.addEventListener('click', nextQuestion);
 submitBtn.addEventListener('click', checkAnswer);
@@ -656,9 +594,11 @@ restartBtn.addEventListener('click', () => {
     updateStatsDisplay();
     showScreen(startScreen);
 });
+backHomeBtn.addEventListener('click', () => {
+    updateHomeStats();
+    showScreen(homeScreen);
+});
 reviewBtn.addEventListener('click', showReview);
-uploadBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', handleFileUpload);
 if (resetStatsBtn) {
     resetStatsBtn.addEventListener('click', resetAllStats);
 }
